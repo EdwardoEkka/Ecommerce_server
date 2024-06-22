@@ -10,4 +10,5 @@ router.post('/manual-sign_in',controller.manual_login);
 router.get('/user-details', authMiddleware, controller.getUserDetails);
 router.post('/addProduct',controller.addToCart);
 router.get('/getCart/:userId',controller.getCart);
+router.delete('/deleteProduct',controller.removeFromCart);
 module.exports=router;
