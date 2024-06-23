@@ -11,4 +11,8 @@ router.get('/user-details', authMiddleware, controller.getUserDetails);
 router.post('/addProduct',controller.addToCart);
 router.get('/getCart/:userId',controller.getCart);
 router.delete('/deleteProduct',controller.removeFromCart);
+//////////
+router.get('/getAllProducts',controller.getAllProducts);
+router.get('/getSingleProduct/:productId',controller.getSingleProduct);
+/////////
 module.exports=router;

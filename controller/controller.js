@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Cart =require("../models/Cart");
+const Data =require("../models/Data");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 
@@ -9,6 +10,7 @@ exports.manualSignUp = async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.send({
+        ok:false,
         status: 400,
         message: "Email alreay Registered",
       });
@@ -23,11 +25,13 @@ exports.manualSignUp = async (req, res) => {
     await newUser.save();
 
     return res.send({
+      ok:true,
       status: 200,
       message: "Sign up successful",
     });
   } catch (error) {
     return res.send({
+      ok:false,
       status: 500,
       message: "Internal Server Error",
       error: error.message,
@@ -43,6 +47,7 @@ exports.manual_login = async (req, res, next) => {
 
     if (!user) {
       return res.send({
+        ok:false,
         status: 401,
         message: "Invaid Email or Password",
       });
@@ -51,6 +56,7 @@ exports.manual_login = async (req, res, next) => {
     // Compare the provided password with the hashed password in the database
     if (password!==user.password) {
       return res.send({
+        ok:false,
         status: 401,
         message: "Invalid Password",
       });
@@ -62,6 +68,7 @@ exports.manual_login = async (req, res, next) => {
     });
 
     return res.send({
+      ok:true,
       status: 200,
       message: "Sign in successful",
       token,
@@ -73,6 +80,7 @@ exports.manual_login = async (req, res, next) => {
     });
   } catch (error) {
     return res.send({
+      ok:false,
       status: 500,
       message: "Internal server error",
       error: error.message,
@@ -87,12 +95,14 @@ exports.getUserDetails = async (req, res) => {
 
     if (!user) {
       return res.send({
+        ok:false,
         status: 401,
         message: "User not found",
       });
     }
 
     return res.send({
+      ok:true,
       status: 200,
       message: "User found",
       user:{
@@ -103,6 +113,7 @@ exports.getUserDetails = async (req, res) => {
     });
   } catch (error) {
     return res.send({
+      ok:false,
       status: 500,
       message: "Internal server error",
       error:error.message
@@ -116,6 +127,7 @@ exports.addToCart = async (req, res) => {
     const existingCart = await Cart.findOne({ userId,productId });
     if (existingCart) {
       return res.send({
+        ok:false,
         status: 400,
         message: "Product already in the cart",
       });
@@ -130,11 +142,13 @@ exports.addToCart = async (req, res) => {
     await newCart.save();
 
     return res.send({
+      ok:true,
       status: 200,
       message: "Product added to cart",
     });
   } catch (error) {
     return res.send({
+      ok:false,
       status: 500,
       message: "Internal Server Error",
       error: error.message,
@@ -147,12 +161,14 @@ exports.getCart = async (req, res) => {
     const userId = req.params.userId;
     const itemCart = await Cart.find({ userId});
     return res.send({
+      ok:true,
       status: 200,
       message: "Cart fetched",
       data:itemCart
     });
   } catch (error) {
     return res.send({
+      ok:false,
       status: 500,
       message: "Internal Server Error",
       error: error.message,
@@ -170,15 +186,33 @@ exports.removeFromCart = async (req, res) => {
     // Check if an item was deleted
     if (result.deletedCount === 0) {
       return res.send({
+        ok:false,
         status: 404,
         message: "Item not found in cart",
       });
     }
 
     return res.send({
+      ok:true,
       status: 200,
       message: "Item removed from cart",
     });
+  } catch (error) {
+    return res.send({
+      ok:false,
+      status: 500,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+
+//////////////////////////////
+exports.getAllProducts = async (req, res) => {
+  try {
+    const products = await Data.find();
+    return res.send(products);
   } catch (error) {
     return res.send({
       status: 500,
@@ -187,3 +221,18 @@ exports.removeFromCart = async (req, res) => {
     });
   }
 };
+
+exports.getSingleProduct = async (req, res) => {
+  try {
+    const productId=req.params.productId;
+    const products = await Data.findOne({id:productId});
+    return res.send(products);
+  } catch (error) {
+    return res.send({
+      status: 500,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+////////////////////////////
